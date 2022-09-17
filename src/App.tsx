@@ -1,26 +1,26 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { TruthTable } from "./TruthTable";
 function App() {
-  const [errorMsg, setErrorMsg] = useState("none");
+  const [errorMsg, setErrorMsg] = useState("empty");
   const [equation, setEquation] = useState("");
   const [validEquation, setValidEqn] = useState(false);
+  const editState = (err: string, valid: boolean) => {
+    setErrorMsg(err);
+    setValidEqn(valid);
+  };
   const validateEquation = (equation: string) => {
-    equation = equation.trim().replaceAll(" ", "");
     equation = equation.toLowerCase();
+    equation = equation.trim();
     let regex = /[2-9]/g;
-    //empty equation
     if (!equation) {
-      setErrorMsg("none");
-      setValidEqn(false);
+      editState("empty", false);
       return false;
     }
     if (regex.test(equation)) {
-      setErrorMsg("digits from 2-9 aren't allowed");
-      setValidEqn(false);
+      editState("digits from 2-9 aren't allowed", false);
       return false;
     }
-    //unclosed bracket
     let stack: string[] = [];
     for (let i = 0; i < equation.length; i++) {
       const token = equation[i];
@@ -28,27 +28,61 @@ function App() {
       if (token == ")") {
         try {
           stack.pop();
-        } catch (error) {
-          setErrorMsg("Improper parenthesses");
-          setValidEqn(false);
+        } catch (e) {
+          editState("Improper parentheses", false);
           return false;
         }
       }
     }
     if (stack.length) {
-      setErrorMsg("Improper parenthesses");
-      setValidEqn(false);
+      editState("Improper parentheses", false);
       return false;
     }
-    regex=/[a-z]/g
+    regex = /[a-z]/g;
     if (!regex.test(equation)) {
-      setErrorMsg("no characters in equation");
-      setValidEqn(false);
+      editState("no characters in equation", false);
       return false;
     }
-    setErrorMsg("none")
-    setValidEqn(true)
-    return true
+    {
+      let regex = /[|&!]/g;
+      let ignore = /[/ ()]/g
+      let lastType = "";
+      let eq = equation
+        .replaceAll("and", " & ")
+        .replaceAll("or", "| ")
+        .replaceAll("&&", "& ")
+        .replaceAll("||", "| ");
+
+      for (let [index, token] of [...eq].entries()) {
+        if (token === " "||ignore.test(token)) continue;
+        else if (regex.test(token)) {
+          if (lastType === "op") {
+            let g = eq.split("");
+            g.splice(index, 1, "( " + token + " <- this shouldn't be here)");
+            console.log(g.join(" "));
+            editState(g.join(" "), false);
+            return false;
+          }
+          lastType = "op";
+        } else {
+          if (lastType === "ch") {
+            let g = eq.split("");
+            g.splice(index, 1, "( " + token + " <- this shouldn't be here)");
+            console.log(g.join(" "));
+            editState(g.join(" "), false);
+            return false;
+          }
+          lastType = "ch";
+        }
+      }
+      if (lastType === "op") {
+        eq = eq + "<- Equations must end with a variable or a bracket";
+        editState(eq, false);
+        return false;
+      }
+    }
+    editState("none", true);
+    return true;
   };
   return (
     <div className="App">
@@ -56,7 +90,9 @@ function App() {
         <p>Enter Logical Expression:</p>
         <p
           className={
-            errorMsg == "none" ? "hidden-paragraph" : "error-paragraph"
+            errorMsg === "none" || errorMsg === "empty"
+              ? "hidden-paragraph"
+              : "error-paragraph"
           }
         >
           {errorMsg}
@@ -69,7 +105,14 @@ function App() {
             setEquation(e.target.value);
           }}
         />
-        {validEquation ? <TruthTable equation={equation} /> : <></>}
+        {validEquation ? (
+          <TruthTable
+            equation={equation}
+            setErrorMsg={(e: string) => setErrorMsg(e)}
+          />
+        ) : (
+          <></>
+        )}
       </header>
     </div>
   );
