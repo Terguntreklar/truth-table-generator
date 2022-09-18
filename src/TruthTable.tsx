@@ -2,7 +2,6 @@ import React from "react";
 import "./TruthTable.css";
 interface truthTableProps {
   equation: string;
-  setErrorMsg: Function;
 }
 
 export const TruthTable: React.FC<truthTableProps> = (prop) => {
@@ -63,10 +62,6 @@ export const TruthTable: React.FC<truthTableProps> = (prop) => {
         continue;
       }
       let topOfStack = opStack[opStack.length - 1];
-      if (!opStack.length || topOfStack == "(") { //doesn't work if brackets have one and only one character
-        opStack.push(token);
-        continue;
-      }
       if (token == "(") {
         opStack.push(token);
         continue;
@@ -74,9 +69,13 @@ export const TruthTable: React.FC<truthTableProps> = (prop) => {
       if (token == ")") {
         while (opStack.length) {
           let op = opStack.pop();
-          if (op == "(") break;
+          if (op === "(") break;
           postFix.push(op!);
         }
+        continue;
+      }
+      if (!opStack.length || topOfStack == "(") {
+        opStack.push(token);
         continue;
       }
       let prevPresedence = symbols.indexOf(topOfStack),
@@ -100,12 +99,10 @@ export const TruthTable: React.FC<truthTableProps> = (prop) => {
     vars: string[],
     boolsArrs: boolean[][],
     stack: string[],
-    charMap: Map<string, boolean[]>,
-    setErr: Function
+    charMap: Map<string, boolean[]>
   ) => {
     let symbols = ["&", "|", "!"];
     let result: boolean[][] = [];
-    console.log(stack);
     for (let i = 0; i < 2 ** vars.length; i++) {
       result.push([]);
       let tempStack = stack.slice().reverse(); //hacky way of making a copy of an array, arr.concat() is also hacky
@@ -144,8 +141,7 @@ export const TruthTable: React.FC<truthTableProps> = (prop) => {
     }
     return result;
   };
-  const truthArray = (equation: string, setErr: Function) => {
-    //TODO:: SEND ERRORMSG STATE TO HERE
+  const truthArray = (equation: string) => {
     let stack = infixtopostfix(equation);
     let vars = getVars(equation); // vars won't be undefined since App.tsx wouldn't allow it
     let boolsArrs = getBoolArr(vars.length);
@@ -156,7 +152,6 @@ export const TruthTable: React.FC<truthTableProps> = (prop) => {
       boolsArrs,
       stack,
       charMap,
-      setErr
     );
     let len: number = 2 ** vars.length;
     let truthArr: JSX.Element[][] = [];
@@ -183,7 +178,7 @@ export const TruthTable: React.FC<truthTableProps> = (prop) => {
         ))}
         <td>result</td>
       </thead>
-      <tbody>{truthArray(formattedEquation,prop.setErrorMsg)}</tbody>
+      <tbody>{truthArray(formattedEquation)}</tbody>
     </table>
   );
 };

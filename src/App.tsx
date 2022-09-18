@@ -44,31 +44,56 @@ function App() {
       return false;
     }
     {
-      let regex = /[|&!]/g;
-      let ignore = /[/ ()]/g
+      //todo:: put the eniter function into this block
+      let symbols = ["!", "&", "|"];
+      let ignore = [" ", "(", ")"];
       let lastType = "";
       let eq = equation
-        .replaceAll("and", " & ")
-        .replaceAll("or", "| ")
-        .replaceAll("&&", "& ")
-        .replaceAll("||", "| ");
+        .replaceAll("and", "&")
+        .replaceAll("or", "|")
+        .replaceAll("&&", "&")
+        .replaceAll("||", "|");
 
       for (let [index, token] of [...eq].entries()) {
-        if (token === " "||ignore.test(token)) continue;
-        else if (regex.test(token)) {
-          if (lastType === "op") {
+        console.log(`on index ${index}, letter = '${token}'
+        the last type was ${lastType}`);
+        if (ignore.includes(token)) continue;
+        else if (symbols.includes(token)) {
+          //handle !
+          if (token == "!") {
+            if (lastType === "ch") {
+              let g = eq.split("");
+              g.splice(
+                index,
+                1,
+                "( " + token + " <- this operation shouldn't be here)"
+              );
+              editState(g.join(" "), false);
+              return false;
+            }
+          }
+          //handle | & &
+          else if (lastType === "op") {
             let g = eq.split("");
-            g.splice(index, 1, "( " + token + " <- this shouldn't be here)");
-            console.log(g.join(" "));
+            g.splice(
+              index,
+              1,
+              "( " + token + " <- this operation shouldn't be here)"
+            );
             editState(g.join(" "), false);
             return false;
           }
           lastType = "op";
         } else {
           if (lastType === "ch") {
+            debugger;
             let g = eq.split("");
-            g.splice(index, 1, "( " + token + " <- this shouldn't be here)");
-            console.log(g.join(" "));
+            g.splice(
+              index,
+              1,
+              "( " + token + " <- this character shouldn't be here)"
+            );
+            console.log(g.join(" "), index);
             editState(g.join(" "), false);
             return false;
           }
@@ -108,7 +133,6 @@ function App() {
         {validEquation ? (
           <TruthTable
             equation={equation}
-            setErrorMsg={(e: string) => setErrorMsg(e)}
           />
         ) : (
           <></>
