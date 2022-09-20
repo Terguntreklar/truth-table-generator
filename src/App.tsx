@@ -26,9 +26,14 @@ function App() {
       const token = equation[i];
       if (token == "(") stack.push(token);
       if (token == ")") {
-        try {
-          stack.pop();
-        } catch (e) {
+        // try {
+        //   stack.pop();
+        // } catch (e) {
+        //   editState("Improper parentheses", false);
+        //   return false;
+        // }
+        if (stack.length) stack.pop();
+        else {
           editState("Improper parentheses", false);
           return false;
         }
@@ -84,9 +89,8 @@ function App() {
             return false;
           }
           lastType = "op";
-        } else {
+        } else if (/[A-Z]/i.test(token)) {
           if (lastType === "ch") {
-            debugger;
             let g = eq.split("");
             g.splice(
               index,
@@ -98,6 +102,17 @@ function App() {
             return false;
           }
           lastType = "ch";
+        } else {
+          //Any other character
+          let g = eq.split("");
+          g.splice(
+            index,
+            1,
+            "( " + token + " <- this character shouldn't be here)"
+          );
+          console.log(g.join(" "), index);
+          editState(g.join(" "), false);
+          return false;
         }
       }
       if (lastType === "op") {
@@ -130,13 +145,7 @@ function App() {
             setEquation(e.target.value);
           }}
         />
-        {validEquation ? (
-          <TruthTable
-            equation={equation}
-          />
-        ) : (
-          <></>
-        )}
+        {validEquation ? <TruthTable equation={equation} /> : <></>}
       </header>
     </div>
   );
