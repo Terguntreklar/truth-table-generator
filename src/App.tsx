@@ -26,12 +26,6 @@ function App() {
       const token = equation[i];
       if (token == "(") stack.push(token);
       if (token == ")") {
-        // try {
-        //   stack.pop();
-        // } catch (e) {
-        //   editState("Improper parentheses", false);
-        //   return false;
-        // }
         if (stack.length) stack.pop();
         else {
           editState("Improper parentheses", false);
@@ -123,6 +117,44 @@ function App() {
     }
     editState("none", true);
     return true;
+  };
+  const validateParens = (equation: string): Function => {
+    let stack: number = 0;
+    let myEquation = equation.split("");
+    myEquation.forEach((elem,i) => {
+      if (elem === "(") {
+        stack++;
+      } else if (elem === ")") {
+        stack--;
+        if (stack <= 0) {
+          return dud(i,"this bracket shouldn't be here");
+        }
+      }
+    });
+    if (stack === 0) {
+       return ()=>dud(-1, "")
+    }
+    else return ()=>dud(0, "A bracket was opened but not closed");
+  };
+  const warnNumber = (equation: string): number => {
+    let a = /[2-9]/g.exec(equation);
+    if (a) {
+      return a.index;
+    } else return -1;
+  };
+  const warnAboutChar = (equation: string): number => {
+    return 0
+  }
+  const dud = (a:number,b:string) => {
+    return ({
+      index: a,
+      message: b,
+    })
+  }
+  const warnAbout = (equation: string) => (index: number, message: string) => {
+    let g = equation.split("");
+    g.splice(index, 1, "( " + equation[index] +` <- ${message})`);
+    editState(g.join(" "), false);
   };
   return (
     <div className="App">
