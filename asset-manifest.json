@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Terguntreklar.truth-table-generator.github.io/static/css/main.833b5b66.css",
-    "main.js": "/Terguntreklar.truth-table-generator.github.io/static/js/main.db0baf3b.js",
-    "static/js/787.28cb0dcd.chunk.js": "/Terguntreklar.truth-table-generator.github.io/static/js/787.28cb0dcd.chunk.js",
-    "index.html": "/Terguntreklar.truth-table-generator.github.io/index.html",
-    "main.833b5b66.css.map": "/Terguntreklar.truth-table-generator.github.io/static/css/main.833b5b66.css.map",
-    "main.db0baf3b.js.map": "/Terguntreklar.truth-table-generator.github.io/static/js/main.db0baf3b.js.map",
-    "787.28cb0dcd.chunk.js.map": "/Terguntreklar.truth-table-generator.github.io/static/js/787.28cb0dcd.chunk.js.map"
+    "main.css": "/truth-table-generator/static/css/main.833b5b66.css",
+    "main.js": "/truth-table-generator/static/js/main.07e49185.js",
+    "static/js/787.28cb0dcd.chunk.js": "/truth-table-generator/static/js/787.28cb0dcd.chunk.js",
+    "index.html": "/truth-table-generator/index.html",
+    "main.833b5b66.css.map": "/truth-table-generator/static/css/main.833b5b66.css.map",
+    "main.07e49185.js.map": "/truth-table-generator/static/js/main.07e49185.js.map",
+    "787.28cb0dcd.chunk.js.map": "/truth-table-generator/static/js/787.28cb0dcd.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.833b5b66.css",
-    "static/js/main.db0baf3b.js"
+    "static/js/main.07e49185.js"
   ]
 }
