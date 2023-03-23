@@ -1,7 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 .App {
+  font-family: 'Roboto', sans-serif;
   text-align: center;
 }
-
+.main-title {
+  font-size: larger;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -29,10 +34,13 @@
 }
 
 .error-paragraph {
-  color: red;
-  font-size: 0.8rem;
+  color: white;
+  font-size: 1rem;
 }
 
 .hidden-paragraph{
   display: none;
+}
+.highlight{
+  color: rgb(255, 98, 0);
 }

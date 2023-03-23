@@ -1,51 +1,63 @@
 import React, { useState } from "react";
 import "./App.css";
 import { TruthTable } from "./TruthTable";
-function App() {
-  const [errorMsg, setErrorMsg] = useState("empty");
+function App(): React.ReactElement | null {
+  const [errorMsg, setErrorMsg] = useState(<></>);
   const [equation, setEquation] = useState("");
   const [validEquation, setValidEqn] = useState(false);
-  const editState = (err: string, valid: boolean) => {
+  const editState = (err: JSX.Element, valid: boolean): void => {
     setErrorMsg(err);
     setValidEqn(valid);
   };
-  const validateEquation = (equation: string) => {
-    equation = equation.toLowerCase();
-    equation = equation.trim();
-    let regex = /[2-9]/g;
-    if (!equation) {
-      editState("empty", false);
-      return false;
-    }
-    if (regex.test(equation)) {
-      editState("digits from 2-9 aren't allowed", false);
-      return false;
-    }
-    let stack: string[] = [];
-    for (let i = 0; i < equation.length; i++) {
-      const token = equation[i];
-      if (token == "(") stack.push(token);
-      if (token == ")") {
-        if (stack.length) stack.pop();
+  const specifyErrorMsg = (err: JSX.Element): void => {
+    editState(err, false);
+  };
+  const hasInvalidParens = (str: string): boolean => {
+    const stack: string[] = [];
+    for (let i = 0; i < str.length; i++) {
+      const token = str[i];
+      if (token === "(") stack.push(token);
+      if (token === ")") {
+        if (stack.length > 0) stack.pop();
         else {
-          editState("Improper parentheses", false);
-          return false;
+          return true;
         }
       }
     }
-    if (stack.length) {
-      editState("Improper parentheses", false);
+    if (stack.length > 0) {
+      return true;
+    }
+    return false;
+  };
+  const validateEquation = (equation: string): boolean => {
+    equation = equation.toLowerCase();
+    equation = equation.trim();
+    if (equation.length === 0) {
+      specifyErrorMsg(<></>);
       return false;
     }
-    regex = /[a-z]/g;
+    if (hasInvalidParens(equation)) {
+      specifyErrorMsg(
+        <p>
+          this equation has improper{" "}
+          <span className="highlight">parentheses</span>
+        </p>
+      );
+      return false;
+    }
+    const regex = /[a-z]/g;
     if (!regex.test(equation)) {
-      editState("no characters in equation", false);
+      specifyErrorMsg(
+        <p>
+          this equation has no<span className="highlight"> characters</span>
+        </p>
+      );
       return false;
     }
     {
-      //todo:: put the eniter function into this block
-      let symbols = ["!", "&", "|"];
-      let ignore = [" ", "(", ")"];
+      // todo:: put the eniter function into this block
+      const symbols = ["!", "&", "|"];
+      const ignore = [" ", "(", ")"];
       let lastType = "";
       let eq = equation
         .replaceAll("and", "&")
@@ -53,120 +65,81 @@ function App() {
         .replaceAll("&&", "&")
         .replaceAll("||", "|");
 
-      for (let [index, token] of [...eq].entries()) {
-        console.log(`on index ${index}, letter = '${token}'
-        the last type was ${lastType}`);
+      for (const [index, token] of [...eq].entries()) {
         if (ignore.includes(token)) continue;
         else if (symbols.includes(token)) {
-          //handle !
-          if (token == "!") {
+          // handle !
+          if (token === "!") {
             if (lastType === "ch") {
-              let g = eq.split("");
-              g.splice(
-                index,
-                1,
-                "( " + token + " <- this operation shouldn't be here)"
+              const g = eq.slice(0, index);
+              const h = eq.slice(index + 1);
+              specifyErrorMsg(
+                <p>
+                  {g} <span className="highlight">{eq[index]}</span> {h}
+                  <span className="highlight">{` (Operation shouldn't be here) `}</span>
+                </p>
               );
-              editState(g.join(" "), false);
               return false;
             }
           }
-          //handle | & &
+          // handle | & &
           else if (lastType === "op") {
-            let g = eq.split("");
-            g.splice(
-              index,
-              1,
-              "( " + token + " <- this operation shouldn't be here)"
+            const g = eq.slice(0, index);
+            const h = eq.slice(index + 1);
+            specifyErrorMsg(
+              <p>
+                {g} <span className="highlight">{eq[index]}</span> {h}
+                <span className="highlight">{` (Operation shouldn't be here) `}</span>
+              </p>
             );
-            editState(g.join(" "), false);
             return false;
           }
           lastType = "op";
         } else if (/[A-Z]/i.test(token)) {
           if (lastType === "ch") {
-            let g = eq.split("");
-            g.splice(
-              index,
-              1,
-              "( " + token + " <- this character shouldn't be here)"
+            const g = eq.slice(0, index);
+            const h = eq.slice(index + 1);
+            specifyErrorMsg(
+              <p>
+                {g} <span className="highlight">{eq[index]}</span> {h}
+                <span className="highlight">{` (character shouldn't be here) `}</span>
+              </p>
             );
-            console.log(g.join(" "), index);
-            editState(g.join(" "), false);
             return false;
           }
           lastType = "ch";
         } else {
-          //Any other character
-          let g = eq.split("");
-          g.splice(
-            index,
-            1,
-            "( " + token + " <- this character shouldn't be here)"
+          // Any other character
+          const g = eq.slice(0, index);
+          const h = eq.slice(index + 1);
+          specifyErrorMsg(
+            <p>
+              {g} <span className="highlight">{eq[index]}</span> {h}
+              <span className="highlight">{` (character shouldn't be here) `}</span>
+            </p>
           );
-          console.log(g.join(" "), index);
-          editState(g.join(" "), false);
           return false;
         }
       }
       if (lastType === "op") {
         eq = eq + "<- Equations must end with a variable or a bracket";
-        editState(eq, false);
+        specifyErrorMsg(
+          <p>
+            this equation has to
+            <span className="highlight"> end with a variable or bracket</span>
+          </p>
+        );
         return false;
       }
     }
-    editState("none", true);
+    setValidEqn(true);
     return true;
-  };
-  const validateParens = (equation: string): Function => {
-    let stack: number = 0;
-    let myEquation = equation.split("");
-    myEquation.forEach((elem,i) => {
-      if (elem === "(") {
-        stack++;
-      } else if (elem === ")") {
-        stack--;
-        if (stack <= 0) {
-          return dud(i,"this bracket shouldn't be here");
-        }
-      }
-    });
-    if (stack === 0) {
-       return ()=>dud(-1, "")
-    }
-    else return ()=>dud(0, "A bracket was opened but not closed");
-  };
-  const warnNumber = (equation: string): number => {
-    let a = /[2-9]/g.exec(equation);
-    if (a) {
-      return a.index;
-    } else return -1;
-  };
-  const warnAboutChar = (equation: string): number => {
-    return 0
-  }
-  const dud = (a:number,b:string) => {
-    return ({
-      index: a,
-      message: b,
-    })
-  }
-  const warnAbout = (equation: string) => (index: number, message: string) => {
-    let g = equation.split("");
-    g.splice(index, 1, "( " + equation[index] +` <- ${message})`);
-    editState(g.join(" "), false);
   };
   return (
     <div className="App">
       <header className="App-header">
-        <p>Enter Logical Expression:</p>
-        <p
-          className={
-            errorMsg === "none" || errorMsg === "empty"
-              ? "hidden-paragraph"
-              : "error-paragraph"
-          }
-        >
+        <p className="main-title">Enter Logical Expression:</p>
+        <p className={validEquation ? "hidden-paragraph" : "error-paragraph"}>
           {errorMsg}
         </p>
         <input
