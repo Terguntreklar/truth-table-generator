@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/truth-table-generator/static/css/main.833b5b66.css",
-    "main.js": "/truth-table-generator/static/js/main.07e49185.js",
+    "main.css": "/truth-table-generator/static/css/main.0439fb16.css",
+    "main.js": "/truth-table-generator/static/js/main.5249fdcf.js",
     "static/js/787.28cb0dcd.chunk.js": "/truth-table-generator/static/js/787.28cb0dcd.chunk.js",
     "index.html": "/truth-table-generator/index.html",
-    "main.833b5b66.css.map": "/truth-table-generator/static/css/main.833b5b66.css.map",
-    "main.07e49185.js.map": "/truth-table-generator/static/js/main.07e49185.js.map",
+    "main.0439fb16.css.map": "/truth-table-generator/static/css/main.0439fb16.css.map",
+    "main.5249fdcf.js.map": "/truth-table-generator/static/js/main.5249fdcf.js.map",
     "787.28cb0dcd.chunk.js.map": "/truth-table-generator/static/js/787.28cb0dcd.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.833b5b66.css",
-    "static/js/main.07e49185.js"
+    "static/css/main.0439fb16.css",
+    "static/js/main.5249fdcf.js"
   ]
 }
